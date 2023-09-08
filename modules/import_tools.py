@@ -5,9 +5,11 @@ import urllib.request
 from io import BytesIO
 from PIL import Image
 
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
 def readValuesFromTxt(filename,local):
-    print(filename)
-    if local: 
+    if local:
         fid = open(filename,'r')
         # values = [map(lambda y: float(y), x.split(' ')) for x in \
 		#  ''.join(fid.read()).split('\n') if x!=''] #.decode('utf-8')
@@ -15,6 +17,7 @@ def readValuesFromTxt(filename,local):
                   ''.join(fid.read()).split('\n') if x != '']
         fid.close()
     else:
+        filename = filename.replace('\\', '/')
         fid = urllib.request.urlopen(filename)
         file_utf = fid.read().decode('utf-8')
         values = [list(map(lambda y: float(y), x.split(' '))) for x in \

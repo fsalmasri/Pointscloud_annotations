@@ -26,6 +26,8 @@ def processJSON(data, currentPath, local, plot):
     conflictList = data['conflictList']
     fileList = data['fileList']
 
+    print(name, extrinsics, len(fileList), len(frames))
+
     # store indices of the empty frames & objects
     emptyFrames = []
     emptyObjects = []
@@ -45,10 +47,11 @@ def processJSON(data, currentPath, local, plot):
         else:
             noneEmptyObjects.append(i)
 
+    # print(join(currentPath, 'data', name, 'intrinsics.txt'))
+    # exit()
     # get camera intrinsics
     K = np.transpose(
         np.reshape(imp.readValuesFromTxt(join(currentPath, 'data', name, 'intrinsics.txt'), local), (3, 3)))
-
 
     # get camera extrinsics //TODO check this function.
     exFile = join(currentPath, 'data', name, 'extrinsics', extrinsics)
@@ -60,6 +63,10 @@ def processJSON(data, currentPath, local, plot):
         #     urllib.request.urlopen(join(currentPath, 'data', name, 'extrinsics')).read().decode('utf-8')) #[-1]
 
     extrinsicsC2W = np.transpose(np.reshape(imp.readValuesFromTxt(exFile, local),(-1, 3, 4)), (1, 2, 0))
+
+    print(K)
+    print(extrinsicsC2W.shape)
+    exit()
 
         # print file stats
     print("-- processing data.....", name)
