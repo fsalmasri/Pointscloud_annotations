@@ -164,7 +164,7 @@ class Frame:
         sys.stdout.flush()
         return self
 
-    def drawPolygons(self, polygons):
+    def drawPolygons(self, polygons, filePath):
         '''draw a set of polygons filled with colour of corresponding objects
         polygons:   a dictionary of object_name:[(x,y)..(x,y)] pairs'''
         sys.stdout.write("\tdrawing polygons:");
@@ -182,7 +182,9 @@ class Frame:
                 draw.polygon(coord, fill=colour)
             for name, coord in self.labels.items():
                 if name not in self.centroids:
-                    errLog = open(join('data', self.loc, 'error.log'), 'a')
+                    # errLog = open(join('data', self.loc, 'error.log'), 'a')
+                    errLog = open(join(filePath, 'error.log'), 'a')
+
                     errLog.write(str(self.ID) + ". " + name + "\tat " + self.loc + '\n')
                     errLog.close()
                     draw.text(coord, name + '\n(no xyz data)', fill="black")

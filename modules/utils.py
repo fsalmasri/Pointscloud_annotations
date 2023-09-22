@@ -26,7 +26,7 @@ def processJSON(data, currentPath, local, plot):
     conflictList = data['conflictList']
     fileList = data['fileList']
 
-    print(name, extrinsics, len(fileList), len(frames))
+    print(f'name: {name}, flst: {len(fileList)}, frames: {len(frames)}')
 
     # store indices of the empty frames & objects
     emptyFrames = []
@@ -48,10 +48,10 @@ def processJSON(data, currentPath, local, plot):
             noneEmptyObjects.append(i)
 
     # print(join(currentPath, 'data', name, 'intrinsics.txt'))
-    # exit()
     # get camera intrinsics
     K = np.transpose(
         np.reshape(imp.readValuesFromTxt(join(currentPath, 'data', name, 'intrinsics.txt'), local), (3, 3)))
+    # K = imp.readValuesFromTxt(join(currentPath, 'data', name, 'intrinsics.txt'), local)
 
     # get camera extrinsics //TODO check this function.
     exFile = join(currentPath, 'data', name, 'extrinsics', extrinsics)
@@ -63,10 +63,6 @@ def processJSON(data, currentPath, local, plot):
         #     urllib.request.urlopen(join(currentPath, 'data', name, 'extrinsics')).read().decode('utf-8')) #[-1]
 
     extrinsicsC2W = np.transpose(np.reshape(imp.readValuesFromTxt(exFile, local),(-1, 3, 4)), (1, 2, 0))
-
-    print(K)
-    print(extrinsicsC2W.shape)
-    exit()
 
         # print file stats
     print("-- processing data.....", name)
@@ -116,11 +112,13 @@ def processJSON(data, currentPath, local, plot):
             depthList = newList
             # ---------------------------------------------#
 
-        fileNum = "0" * (7 - len(str(1 + i * 5))) + str(1 + i * 5) + "-"
-        index = [idx for idx, s in enumerate(imageList) if fileNum in s][0]
-        image = join(imagePath, imageList[index])
-        index = [idx for idx, s in enumerate(depthList) if fileNum in s][0]
-        depth = join(depthPath, depthList[index])
+        # fileNum = "0" * (7 - len(str(1 + i * 5))) + str(1 + i * 5) + "-"
+        # index = [idx for idx, s in enumerate(imageList) if fileNum in s][0]
+        # image = join(imagePath, imageList[index])
+        image = join(imagePath, imageList[i])
+        # index = [idx for idx, s in enumerate(depthList) if fileNum in s][0]
+        # depth = join(depthPath, depthList[index])
+        depth = join(depthPath, depthList[i])
 
         # for img in imageList:
         #     # fileNum = "0" * (7 - len(str(1 + i * 5))) + str(1 + i * 5) + "-"
@@ -147,8 +145,7 @@ def processJSON(data, currentPath, local, plot):
         currentFrame.background = background
         currentFrame.depthMap = imp.depthRead(depth, local)
         currentFrame.intrinsics = K
-        currentFrame.extrinsics = imp.getExtrinsics(extrinsicsC2W, i)
-
+        currentFrame.extrinsics = extrinsicsC2W[:,:,i] #imp.getExtrinsics(extrinsicsC2W, i)
 
         exceptions = []
         conflicts = []
@@ -186,7 +183,8 @@ def processJSON(data, currentPath, local, plot):
             currentFrame.addObject(currentObject)
 
 
-        filePath = join('data', name)
+        filePath = join(currentPath, 'out', name)
+
         try:
             makedirs(filePath)
         except OSError:
@@ -197,7 +195,7 @@ def processJSON(data, currentPath, local, plot):
         currentFrame = (currentFrame.update()
                         .calculateCentroids(polygons)
                         .getAngleDistCombos()
-                        .drawPolygons(polygons)
+                        .drawPolygons(polygons, filePath)
                         .process3dPoints(polygons, filePath, int(plot))
                         .export(filePath, str(i)))
 
@@ -206,7 +204,7 @@ def processJSON(data, currentPath, local, plot):
         # np.savetxt(join(filePath,str(i)+'.co'),conflicts,fmt="%s")
         sys.stdout.write("\ttotal time for frame %s:" % str(currentFrame.ID))
         currentFrame = None
-        sys.stdout.write(" \t%s sec." % str(endTimer(frameTimer)));
+        sys.stdout.write(" \t%s sec." % str(endTimer(frameTimer)))
         sys.stdout.flush()
 
     return allObjects

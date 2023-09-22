@@ -45,7 +45,10 @@ if __name__ == "__main__":
         response = '1' #menu.mainMenu()
         if response == '1': # process each json file
             response = None
-            options = ['http://sun3d.cs.princeton.edu/', False, '1'] #menu.optionMenu() ['', True, '1'] #
+            # options = ['http://sun3d.cs.princeton.edu/', False, '1']
+            # options = [r'C:\Users\fedai\Desktop\data\sun3d', True, '1']
+            options = [r'C:\Users\fedai\Desktop\data\rgbd-scenes-v2', True, 1]
+
             if options == "menu": continue # back to main menu
             currentPath = options[0]
             local =       options[1]
@@ -55,9 +58,11 @@ if __name__ == "__main__":
                 startB = startTimer()
                 with open(join("json",jFile)) as jData:
                     data = json.load(jData)
+                # if data['name'] == 'mit_76_459/76-459b':
+                if data['name'] == 'scene_01':
                     # if os.path.exists(f'data/{data["name"]}'):
                     allObjects = processJSON(data,currentPath,local,plot) # process each json file
-                    # exit()
+            exit()
                     # print("\n** File processed in %s seconds."% str(endTimer(startB)))
                     # print("** Total: "+str(jNum+1)+ " files processed in %s seconds." % str(endTimer(startA)))
                     # print("**",len(allObjects),"total objects in %s JSON files.\n" % str(jNum+1))
